@@ -309,7 +309,12 @@ def get_xy_with_orig(dataset, set_name, language, vuln_type, features=None):
         set_dfs = pickle.load(pickle_file)
 
         orig = set_dfs[set_name][language][vuln_type]
-        X = set_dfs[set_name][language][vuln_type].drop(['file_name', 'line', 'vulnerable'], axis=1)
+        # Fix missing 41 features
+        if vuln_type == 'SQLi' and set_name != 'testing_set':
+            print_notice("Fix missing feature in testing set for SQLi")
+            X = set_dfs[set_name][language][vuln_type].drop(['file_name', 'line', 'vulnerable', 'func_htmlentities'], axis=1)
+        else:
+            X = set_dfs[set_name][language][vuln_type].drop(['file_name', 'line', 'vulnerable'], axis=1)
         Y = set_dfs[set_name][language][vuln_type]['vulnerable']
 
     num_features = len(X.columns)
